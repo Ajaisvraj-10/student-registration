@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{blog.Name}}</h1>
+<p>{{blog.Class}}</p>
+<p>{{blog.Division}}</p>
+<p>{{blog.RollNo}}</p>
+<h2>{{blog.author.first_name}}</h2>
+{% if blog.cover_image %}
+
+<img src="{{blog.cover_image.url}}" alt="AVR_IMAGES" height="500px" />
+
+{% endif %}
+
+{% if blog.author == request.user %}
+<a style="text-decoration: none" href="{%url 'edit' blog.id%}">Edit Blog</a>
+<br /><br />
+<a style="text-decoration: none" href="{%url 'delete' blog.id%}">Delete Blog</a>
+{% endif %}
+
+<form action="{% if edit %}{% url 'comment_edit' cmd.id %}{% else %}{% url 'comment_post' blog.id %}{% endif %}" method="post" >
+  {% csrf_token %}
+
+  <input type="text" name="comment" value="{{cmd.text}}"/>
+  <input type="submit" name="Post"/>
+</form>
+
+{% for comment in comments %} 
+
+{% if comment != cmd %}
+
+
+{{comment.text}} <br />
+- {{comment.comment_author.first_name}} , {{comment.created}} \
+
+{% if request.user == comment.comment_author %}
+  <a style="text-decoration: none;" href="{% url 'comment_delete' comment.id %}">Delete comment</a> <br><br>
+  <a style="text-decoration: none;" href="{% url 'comment_edit' comment.id %}">Edit comment</a>
+{% endif %}
+
+
+<hr/>
+{% endif %}
+
+{% endfor %}
+
+{% endblock content %}
